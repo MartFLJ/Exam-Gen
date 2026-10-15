@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exam-Gen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#f3f3f0;--panel:#fff;--soft:#f8f8f5;--hover:#eeeeea;--text:#171717;--muted:#777;--border:#e4e4df;--primary:#171717;--on:#fff;--danger:#b33;--warn:#c47a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141316;--panel:#1e1c21;--soft:#19171b;--hover:#2a272f;--text:#f1eef5;--muted:#9a95a3;--border:#34303a;--primary:#f1eef5;--on:#171717;--danger:#ff7b7b;--warn:#ffb84d}}
+:root[data-theme="dark"]{--bg:#141316;--panel:#1e1c21;--soft:#19171b;--hover:#2a272f;--text:#f1eef5;--muted:#9a95a3;--border:#34303a;--primary:#f1eef5;--on:#171717;--danger:#ff7b7b;--warn:#ffb84d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif}
+button{font:inherit;color:inherit}[hidden]{display:none!important}
+.app{min-height:100dvh;display:grid;grid-template-columns:220px 1fr}
+.sidebar{background:var(--soft);border-right:1px solid var(--border);padding:24px 16px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column}
+.logo{font:700 19px "Space Grotesk",sans-serif;padding:0 10px;margin-bottom:28px}.logo span{color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav button{border:0;background:0;padding:12px 13px;border-radius:10px;text-align:left;color:var(--muted);cursor:pointer}
+.nav button:hover{background:var(--hover);color:var(--text)}.nav button.active{background:var(--primary);color:var(--on)}
+.main{min-width:0}
+.topbar{min-height:64px;padding:env(safe-area-inset-top,0) 28px 0;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--panel) 80%,transparent);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:10}
+.status{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0;flex:1}
+.status strong{font:600 16px "Space Grotesk",sans-serif;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status span{color:var(--muted);font-size:12px}.status span::before{content:"·";margin-right:8px}.status span:empty{display:none}
+.top-actions{display:flex;gap:8px}
+.btn{border:1px solid var(--border);background:var(--panel);border-radius:9px;padding:9px 13px;cursor:pointer;font-size:13px}
+.btn:hover{background:var(--hover)}.btn.primary{background:var(--primary);color:var(--on);border-color:var(--primary)}.btn.danger{color:var(--danger)}.btn.sm{padding:7px 10px;font-size:12px}.btn.full{width:100%}
+.content{max-width:760px;margin:0 auto;padding:28px}
+.panel{display:none}.panel.active{display:block}
+h2{font:700 20px "Space Grotesk",sans-serif;margin:0 0 4px}.desc{color:var(--muted);font-size:12px;margin:0 0 18px}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:16px;margin-top:16px}
+.card>h3{font:700 14px "Space Grotesk",sans-serif;margin:0 0 12px}
+label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}small{color:var(--muted);font-weight:400}
+input,select,textarea{width:100%;border:1px solid var(--border);background:var(--soft);color:var(--text);border-radius:9px;padding:10px 11px;font:inherit;font-size:13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--muted)}textarea{resize:vertical}
+input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--primary)}
+.fg{margin-bottom:14px}.grid2,.grid3{display:grid;gap:12px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}
+.muted{color:var(--muted);font-size:12px;margin:10px 0 0}
+.hint{background:var(--hover);border-radius:9px;padding:10px 12px;font-size:12px;margin:12px 0;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.item{background:var(--soft);border-radius:10px;padding:12px;margin-top:8px}.item.cur{box-shadow:0 0 0 1.5px var(--primary)}
+.item strong{display:block;font-size:13px}.item .meta{display:block;color:var(--muted);font-size:11px;margin-top:3px}.item .row{margin-top:10px}
+.drop{border:1.5px dashed var(--border);border-radius:10px;padding:22px 12px;text-align:center;color:var(--muted);font-size:12px;margin-bottom:12px}.drop.over{border-color:var(--primary);background:var(--hover);color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--hover);border-radius:20px;padding:3px 4px 3px 11px;font-size:12px}
+.chip button{border:0;background:0;cursor:pointer;color:var(--muted);padding:2px 5px}
+.q{border:1px solid var(--border);border-radius:10px;margin-top:8px;background:var(--soft)}
+.q>summary{cursor:pointer;list-style:none;padding:11px 12px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.q>summary::-webkit-details-marker{display:none}
+.qt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badges{display:flex;gap:5px;flex-shrink:0}.badge{background:var(--hover);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--muted);white-space:nowrap}.badge.w{color:var(--warn);font-weight:600}
+.qbody{padding:2px 12px 14px;border-top:1px solid var(--border)}
+.orow{display:grid;grid-template-columns:22px 1fr 30px;gap:6px;align-items:center;margin-bottom:8px}.orow .why{grid-column:2/-1;font-size:12px}
+.icon{width:30px;height:30px;border:0;background:var(--hover);border-radius:7px;cursor:pointer}.icon:disabled{opacity:.35;cursor:not-allowed}
+.add{width:100%;border:1px dashed var(--border);background:0;padding:10px;border-radius:9px;cursor:pointer;color:var(--muted);margin:4px 0 14px}.add:hover{background:var(--hover)}
+.option{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px}
+.switch{width:38px;height:21px;background:var(--border);border:0;border-radius:20px;padding:2px;cursor:pointer}.switch.active{background:var(--primary)}
+.dot{display:block;width:17px;height:17px;background:var(--panel);border-radius:50%;transition:transform .2s}.switch.active .dot{transform:translateX(17px)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--primary);color:var(--on);padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:30}#toast.show{opacity:1;transform:translate(-50%,0)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.rh{display:flex;justify-content:space-between;align-items:center}.clock{font:700 22px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}.clock.low{color:var(--danger)}
+.qtext{font-size:15px;font-weight:600;margin:0 0 14px;white-space:pre-wrap}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;background:var(--soft);font-size:13px;font-weight:400}.opt:has(input:checked){border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.qnav{display:flex;flex-wrap:wrap;gap:6px}.nb{width:34px;height:34px;border:1px solid var(--border);background:var(--soft);border-radius:8px;cursor:pointer;font-size:12px}.nb.on{background:var(--hover);font-weight:700}.nb.cur{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.big{font:700 40px "Space Grotesk",sans-serif;margin:0}
+.bar{height:8px;background:var(--hover);border-radius:4px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--primary)}
+.ro{display:flex;gap:8px;padding:6px 8px;border-radius:8px;margin-top:5px;font-size:13px}.ro.good{background:color-mix(in srgb,#2a8a4a 18%,transparent)}.ro.bad{background:color-mix(in srgb,var(--danger) 18%,transparent)}.ro small{display:block}
+.sidebar-bottom{margin-top:auto;padding:12px 10px;font-size:12px;color:var(--muted)}
+.content.wide{max-width:1180px}
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}.dbox{background:var(--panel);border-radius:14px;padding:20px;max-width:380px;width:100%}.dbox p{margin:0 0 14px;white-space:pre-wrap}.dbox input{margin-bottom:14px}
+.exgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}.exgrid .card{margin-top:0}
+.exmain{grid-column:1;grid-row:1}.exside{grid-column:2;grid-row:1;display:grid;gap:16px;position:sticky;top:80px}
+.exmain{display:grid;gap:16px;min-width:0;align-content:start}.exmain.st .card{min-height:0}.exside.ns{position:static}.exside .grid2{grid-template-columns:1fr}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.mv{font:700 22px "Space Grotesk",sans-serif}
+.exmain .qtext{font-size:17px}.exmain .card{min-height:260px}
+.nb.fl{border-bottom:3px solid var(--warn)}.flag.on{border-color:var(--warn);color:var(--warn);font-weight:600}
+.mk{font-weight:700}.q.bad{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,var(--soft))}.q.bad .mk{color:var(--danger)}.q.good{border-color:color-mix(in srgb,#2a8a4a 55%,var(--border))}.q.good .mk{color:#2a8a4a}
+.chip{padding-left:6px}.cc{width:22px;height:22px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;overflow:hidden;flex:none}
+.cc::-webkit-color-swatch-wrapper{padding:0}.cc::-webkit-color-swatch{border:0;border-radius:50%}.cc::-moz-color-swatch{border:0;border-radius:50%}
+.dot2{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+@media (max-width:900px){.exgrid{grid-template-columns:1fr}.exmain,.exside{grid-column:auto;grid-row:auto}.exside{position:static}}
+.mobile-nav{display:none}
+@media (max-width:900px){
+.app{grid-template-columns:1fr}.sidebar{display:none}.content{padding:16px 14px calc(84px + env(safe-area-inset-bottom,0))}.topbar{padding-left:14px;padding-right:14px}.badges .badge:not(.w){display:none}.grid2{grid-template-columns:1fr}
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(62px + env(safe-area-inset-bottom,0));padding-bottom:env(safe-area-inset-bottom,0);background:var(--panel);border-top:1px solid var(--border);z-index:20}
+.mobile-nav button{flex:1;border:0;background:0;color:var(--muted);font-size:11px;cursor:pointer}.mobile-nav button.active{color:var(--text);font-weight:700}
+#toast{bottom:calc(76px + env(safe-area-inset-bottom,0))}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar"><div class="logo">EXAM<span>-GEN</span></div>
+<nav class="nav">
+<button data-nav="library" class="active">◈ Biblioteca</button><button data-nav="questions">✎ Preguntas</button><button data-nav="exam">▶ Examen</button><button data-nav="stats">◔ Estadísticas</button>
+</nav><div class="sidebar-bottom">v5</div></aside>
+<main class="main">
+<header class="topbar">
+<div class="status" aria-live="polite"><strong id="stName"></strong><span id="stState"></span><span id="stBackup"></span></div>
+<div class="top-actions"><button class="btn" id="modeBtn" aria-label="Cambiar modo claro/oscuro">☾</button><button class="btn" id="newBtn">+ Nuevo</button></div>
+</header>
+<section class="content">
+
+<div class="panel active" data-panel="library">
+<h2>Biblioteca</h2><p class="desc">Tus exámenes, guardados en este navegador.</p>
+<div class="card"><h3>Exámenes</h3>
+<div id="emptyLib" hidden><p style="margin:0 0 4px;font-weight:700">Aún no tienes exámenes</p><p class="muted" style="margin:0 0 14px">Crea uno desde cero, mira un ejemplo o importa un archivo JSON.</p>
+<div class="row"><button class="btn primary" data-act="new">+ Nuevo examen</button><button class="btn" id="exBtn">Ver ejemplo</button></div></div>
+<div id="examList"></div></div>
+<div class="card"><h3>Importar y exportar</h3>
+<div class="drop" id="drop">Arrastra aquí un archivo .json para cargarlo</div>
+<div class="row"><button class="btn" id="impBtn">Importar archivo</button><button class="btn" id="pasteBtn">Pegar JSON</button><button class="btn" id="expAll">Exportar todos</button></div>
+<input type="file" id="impFile" accept=".json,application/json" hidden>
+<div id="pasteBox" hidden><textarea id="pasteText" rows="6" spellcheck="false" placeholder="Pega aquí el contenido del JSON" style="margin:10px 0;font-family:ui-monospace,Menlo,monospace;font-size:12px"></textarea>
+<div class="row"><button class="btn primary" id="pasteLoad">Cargar</button><button class="btn" id="pasteCancel">Cancelar</button></div></div>
+<div id="backup"></div>
+<p class="muted">Los exámenes importados nunca pisan los tuyos: si ya existe uno igual, se guarda como copia.</p></div>
+</div>
+
+<div class="panel" data-panel="questions">
+<h2>Preguntas</h2><p class="desc">Edita el examen abierto: datos, categorías y banco de preguntas.</p>
+<div id="qEmpty" class="card"><p style="margin:0 0 12px">No hay un examen abierto. Ábrelo o créalo desde la Biblioteca.</p><button class="btn primary" data-nav="library">Ir a la Biblioteca</button></div>
+<div id="qMain" hidden><div class="exgrid"><div class="exside ns">
+<div class="card"><h3>Examen</h3>
+<div class="fg"><label for="eName">Nombre</label><input id="eName" maxlength="60"></div>
+<div class="fg"><label for="eDesc">Descripción</label><input id="eDesc" maxlength="300" placeholder="Opcional"></div>
+<div class="grid2"><div class="fg" style="margin:0"><label for="eMin">Tiempo del examen completo (min)</label><input type="number" id="eMin" min="1" max="600"></div>
+<div class="fg" style="margin:0"><label for="ePer">Preguntas por examen completo</label><input type="number" id="ePer" min="1" max="500"></div></div>
+<div class="hint" id="eHint" hidden></div>
+<div style="margin-top:12px"><div class="option"><span>Permitir volver a preguntas anteriores</span><button class="switch" id="swBack" role="switch"><span class="dot"></span></button></div>
+<div class="option"><span>Orden aleatorio de las preguntas</span><button class="switch" id="swShuf" role="switch"><span class="dot"></span></button></div>
+<div class="option" style="padding-bottom:0"><span>Mostrar la respuesta correcta al contestar</span><button class="switch" id="swFb" role="switch"><span class="dot"></span></button></div>
+<p class="muted">Si el orden no es aleatorio se usa el del banco: reordénalo con ▲▼ dentro de cada pregunta.</p></div></div>
+<div class="card"><h3>Categorías</h3><div class="chips" id="catChips"></div>
+<div class="row"><input id="catNew" maxlength="30" placeholder="Nueva categoría (ej. EC2, RDS, Seguridad)" style="flex:1 1 200px;width:auto"><button class="btn" id="catAdd" style="flex:0 0 auto">Agregar</button></div></div>
+</div><div class="exmain"><div class="card"><h3>Banco de preguntas</h3>
+<div class="row"><select id="qFilter" aria-label="Filtrar por categoría" style="flex:1 1 180px;width:auto"></select><button class="btn primary" id="addQ" style="flex:0 0 auto">+ Agregar pregunta</button></div>
+<input id="qSearch" placeholder="Buscar en el enunciado…" style="margin-top:10px"><div id="qList"></div></div></div></div></div></div>
+
+<div class="panel" data-panel="exam"><h2>Examen</h2><p class="desc">Modo examen completo y modo diario.</p>
+<div id="exBox"></div></div>
+<div class="panel" data-panel="stats"><h2>Estadísticas</h2><p class="desc">Cómo te va con cada examen.</p>
+<div id="stBox"></div></div>
+
+</section></main></div>
+<nav class="mobile-nav"><button data-nav="library" class="active">Biblioteca</button><button data-nav="questions">Preguntas</button><button data-nav="exam">Examen</button><button data-nav="stats">Estadísticas</button></nav>
+<div id="dlg" hidden><div class="dbox"><p id="dMsg"></p><input id="dIn" maxlength="60" hidden><div class="row"><button class="btn" id="dNo">Cancelar</button><button class="btn primary" id="dYes">Aceptar</button></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const VERSION = 1, $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), clone = o => JSON.parse(JSON.stringify(o));
+const rid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const mem = {}, LS = {
+  read(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return mem[k] ?? null; } },
+  write(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+};
+const DIFF = ["", "Fácil", "Media", "Difícil"];
+const PALETTE = ["#e0457b", "#2f7de1", "#e8a21a", "#2a9d6f", "#8e5ad7", "#e8663d", "#17a2b8", "#7a8a2b", "#c2417d", "#5c6bc0"];
+const colorOf = (e, c) => e.colors[c] || PALETTE[Math.max(0, e.categories.indexOf(c)) % PALETTE.length], qColor = (e, q) => (q.cat ? colorOf(e, q.cat) : "transparent");
+
+/* ---------- modelo ---------- */
+const newOpt = () => ({ t: "", ok: false, why: "" });
+const newQ = () => ({ id: rid("q"), text: "", options: [{ ...newOpt(), ok: true }, newOpt(), newOpt(), newOpt()], multiple: false, cat: "", diff: 2, weight: 3, expl: "" });
+const newExam = () => ({ id: rid("e"), updated: Date.now(), name: "Nuevo examen", desc: "", minutes: 60, perExam: 20, categories: [], colors: {}, opts: { back: true, shuffle: true, feedback: false }, questions: [] });
+const oneOk = opts => { let f = false; opts.forEach(o => { if (o.ok && f) o.ok = false; f = f || o.ok; }); };
+
+function cleanQ(r) {
+  r = r && typeof r === "object" ? r : {};
+  const opts = (Array.isArray(r.options) ? r.options : []).slice(0, 8).map(o => typeof o === "string" ? { t: o.slice(0, 300), ok: false, why: "" } : { t: String(o && o.t != null ? o.t : "").slice(0, 300), ok: !!(o && o.ok), why: String(o && o.why != null ? o.why : "").slice(0, 500) });
+  while (opts.length < 2) opts.push(newOpt());
+  const multiple = !!r.multiple; if (!multiple) oneOk(opts);
+  return { id: typeof r.id === "string" && r.id ? r.id.slice(0, 40) : rid("q"), text: String(r.text ?? "").slice(0, 1000), options: opts, multiple,
+    cat: String(r.cat ?? "").trim().slice(0, 30), diff: clamp(Math.round(+r.diff) || 2, 1, 3), weight: clamp(Math.round(+r.weight) || 3, 1, 5), expl: String(r.expl ?? "").slice(0, 1500) };
+}
+// Construye un examen válido a partir de cualquier dato (JSON importado, versiones futuras, etc.).
+function migrate(r) {
+  r = r && typeof r === "object" ? r : {};
+  const qs = (Array.isArray(r.questions) ? r.questions : []).slice(0, 1000).map(cleanQ), seen = new Set();
+  qs.forEach(q => { if (seen.has(q.id)) q.id = rid("q"); seen.add(q.id); });
+  const cats = [...new Set([...(Array.isArray(r.categories) ? r.categories : []).map(c => String(c).trim().slice(0, 30)), ...qs.map(q => q.cat)].filter(Boolean))].slice(0, 40);
+  qs.forEach(q => { if (!cats.includes(q.cat)) q.cat = ""; });
+  const colors = {}; cats.forEach((c, i) => { const v = r.colors && r.colors[c]; colors[c] = typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v) ? v : PALETTE[i % PALETTE.length]; });
+  return { id: typeof r.id === "string" && r.id ? r.id.slice(0, 40) : rid("e"), updated: Number(r.updated) || 0, name: String(r.name ?? "Examen").slice(0, 60), desc: String(r.desc ?? "").slice(0, 300),
+    minutes: clamp(Math.round(+r.minutes) || 60, 1, 600), perExam: clamp(Math.round(+r.perExam) || 20, 1, 500), categories: cats, colors, opts: { back: !(r.opts && r.opts.back === false), shuffle: !(r.opts && r.opts.shuffle === false), feedback: !!(r.opts && r.opts.feedback) }, questions: qs };
+}
+const incomplete = q => { const o = q.options.filter(x => x.t.trim()); return !q.text.trim() || o.length < 2 || !o.some(x => x.ok); };
+
+/* ---------- estado y guardado automático ---------- */
+let exams = (Array.isArray(LS.read("exam-bank")) ? LS.read("exam-bank") : []).map(migrate);
+let curId = LS.read("exam-current"); if (!exams.some(e => e.id === curId)) curId = null;
+const cur = () => exams.find(e => e.id === curId) || null;
+let saveOk = true, timer = null, toastT;
+function flush() { clearTimeout(timer); timer = null; saveOk = LS.write("exam-bank", exams) && LS.write("exam-current", curId); status(); }
+function touch() { const e = cur(); if (e) e.updated = Date.now(); clearTimeout(timer); timer = setTimeout(flush, 400); }
+window.addEventListener("beforeunload", () => { if (timer) flush(); });
+document.addEventListener("visibilitychange", () => { if (document.hidden && timer) flush(); });
+function backupText() {
+  const l = Number(LS.read("exam-lastexport")) || 0;
+  if (!l) return exams.length ? "Sin respaldo" : "";
+  const d = Math.floor((Date.now() - l) / 864e5);
+  return "Último respaldo " + (d < 1 ? "hoy" : d === 1 ? "hace 1 día" : `hace ${d} días`);
+}
+function status() {
+  const e = cur();
+  $("stName").textContent = e ? e.name || "Sin nombre" : "Sin examen abierto";
+  $("stState").textContent = saveOk ? "Guardado en este navegador" : "No se pudo guardar: almacenamiento lleno";
+  $("stState").style.color = saveOk ? "" : "var(--warn)";
+  $("stBackup").textContent = backupText();
+}
+function say(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2800); }
+const slug = s => (s || "examen").toLowerCase().replace(/[^a-z0-9áéíóúñ]+/gi, "-").replace(/^-|-$/g, "") || "examen";
+function saveFile(name, blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+
+// Diálogo propio: confirm() y prompt() quedan bloqueados dentro de iframes sandbox (p. ej. la vista previa de Claude).
+function ask(msg, def) {
+  return new Promise(res => {
+    const d = $("dlg"), i = $("dIn"), txt = def !== undefined;
+    $("dMsg").textContent = msg; i.hidden = !txt; i.value = def || ""; d.hidden = false; (txt ? i : $("dYes")).focus();
+    const end = v => { d.hidden = true; $("dYes").onclick = $("dNo").onclick = d.onkeydown = null; res(v); };
+    $("dYes").onclick = () => end(txt ? i.value : true); $("dNo").onclick = () => end(txt ? null : false);
+    d.onkeydown = ev => { if (ev.key === "Escape") $("dNo").click(); else if (ev.key === "Enter" && ev.target === i) $("dYes").click(); };
+  });
+}
+/* ---------- modo claro / oscuro de la app ---------- */
+const sysDark = () => !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+const curMode = () => document.documentElement.dataset.theme || (sysDark() ? "dark" : "light");
+function applyMode(m) { if (m === "light" || m === "dark") document.documentElement.dataset.theme = m; $("modeBtn").textContent = curMode() === "dark" ? "☀" : "☾"; }
+{ const sv = LS.read("exam-ui"); applyMode(sv && sv.mode); }
+$("modeBtn").onclick = () => { const m = curMode() === "dark" ? "light" : "dark"; applyMode(m); LS.write("exam-ui", { mode: m }); };
+
+/* ---------- navegación ---------- */
+function openPanel(name) {
+  document.querySelectorAll("[data-panel]").forEach(p => p.classList.toggle("active", p.dataset.panel === name));
+  document.querySelectorAll("[data-nav]").forEach(b => { if (b.closest(".nav,.mobile-nav")) b.classList.toggle("active", b.dataset.nav === name); });
+  if (name === "questions") renderQ();
+  wide(name === "questions" || name === "stats");
+  if (name === "stats") renderStats();
+  if (name === "exam") renderExam();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("[data-nav]").forEach(b => { b.onclick = () => openPanel(b.dataset.nav); });
+
+/* ---------- biblioteca ---------- */
+const fmt = t => (t ? new Date(t).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" }) : "—");
+function renderLib() {
+  const box = $("examList"); box.innerHTML = "";
+  exams.forEach(e => {
+    const d = document.createElement("div"); d.className = "item" + (e.id === curId ? " cur" : "");
+    d.innerHTML = `<strong>${esc(e.name)}</strong><span class="meta">${e.questions.length} preguntas · ${e.minutes} min · ${e.perExam} por examen · ${e.categories.length} categorías</span><span class="meta">Última edición: ${fmt(e.updated)}</span><div class="row"><button class="btn sm">Abrir</button><button class="btn sm">Duplicar</button><button class="btn sm">Exportar</button><button class="btn sm danger">Borrar</button></div>`;
+    const [op, dup, ex, del] = d.querySelectorAll("button");
+    op.onclick = () => { curId = e.id; flush(); renderLib(); openPanel("questions"); };
+    dup.onclick = () => { const c = migrate(clone(e)); c.id = rid("e"); c.name = e.name.slice(0, 50) + " (copia)"; c.updated = Date.now(); exams.unshift(c); flush(); renderLib(); say("Examen duplicado."); };
+    ex.onclick = () => exportList([e], slug(e.name) + ".json");
+    del.onclick = async () => { if (!await ask(`¿Borrar «${e.name}» con sus ${e.questions.length} preguntas?`)) return; exams = exams.filter(x => x.id !== e.id); if (curId === e.id) curId = null; flush(); renderLib(); say("Examen borrado."); };
+    box.appendChild(d);
+  });
+  $("emptyLib").hidden = exams.length > 0;
+  const last = Number(LS.read("exam-lastexport")) || 0, pend = last ? exams.filter(e => (e.updated || 0) > last).length : exams.length;
+  const nudge = pend > 0 && (!last || Date.now() - last > 14 * 864e5), b = $("backup");
+  b.className = !exams.length ? "" : nudge ? "hint" : "muted";
+  b.innerHTML = exams.length ? `<span>Último respaldo: ${last ? fmt(last) : "nunca"}${pend ? ` · ${pend} examen${pend > 1 ? "es" : ""} sin respaldar` : ""}</span>` + (nudge ? '<button class="btn sm" id="bkNow">Respaldar</button>' : "") : "";
+  if (nudge) $("bkNow").onclick = () => $("expAll").click();
+  status();
+}
+function addExam(e) { exams.unshift(e); curId = e.id; flush(); renderLib(); openPanel("questions"); }
+document.querySelectorAll("[data-act=new]").forEach(b => { b.onclick = () => { addExam(newExam()); say("Examen creado."); $("eName").select(); }; });
+$("newBtn").onclick = () => document.querySelector("[data-act=new]").click();
+$("exBtn").onclick = () => {
+  const O = (t, ok, why) => ({ t, ok: !!ok, why: why || "" });
+  addExam(migrate({ id: "ejemplo", updated: Date.now(), name: "Ejemplo: fundamentos de nube", desc: "Examen de muestra con dos preguntas. Puedes editarlo o borrarlo.", minutes: 10, perExam: 2, questions: [
+    { text: "¿Qué servicio de AWS ofrece almacenamiento de objetos?", options: [O("Amazon S3", 1, "S3 es el servicio de almacenamiento de objetos."), O("Amazon EC2", 0, "EC2 ofrece servidores virtuales."), O("Amazon RDS", 0, "RDS es para bases de datos relacionales.")], cat: "Almacenamiento", diff: 1, weight: 3, expl: "Los archivos se guardan como objetos dentro de buckets de S3." },
+    { text: "¿Cuáles son características de Amazon EC2? (elige dos)", multiple: true, options: [O("Capacidad de cómputo redimensionable", 1), O("DNS administrado"), O("Pago por uso de las instancias", 1), O("Almacenamiento de objetos ilimitado")], cat: "EC2", diff: 2, weight: 4, expl: "EC2 es cómputo elástico con precios por uso." }] }));
+};
+
+/* ---------- exportar / importar ---------- */
+function exportList(list, name) {
+  saveFile(name, new Blob([JSON.stringify({ format: "exam-generator", version: VERSION, exported: new Date().toISOString(), examenes: list.map(migrate) }, null, 2)], { type: "application/json" }));
+  say(list.length === 1 ? "Examen exportado." : `${list.length} exámenes exportados.`);
+}
+$("expAll").onclick = () => { if (!exams.length) { say("No hay exámenes para exportar."); return; } exportList(exams, "exam-generator-examenes.json"); LS.write("exam-lastexport", Date.now()); renderLib(); };
+async function importText(raw) {
+  let data; try { data = JSON.parse(raw); } catch (e) { say("Eso no es un JSON válido."); return false; }
+  const list = (Array.isArray(data) ? data : data && Array.isArray(data.examenes) ? data.examenes : data && typeof data === "object" ? [data] : [])
+    .slice(0, 50).filter(x => x && typeof x === "object" && Array.isArray(x.questions));
+  if (!list.length) { say("El JSON no contiene exámenes."); return false; }
+  const items = list.map(migrate), taken = new Set(exams.map(e => e.id)), dups = items.filter(x => taken.has(x.id)).length;
+  if (!await ask(`Se importarán ${items.length} examen${items.length > 1 ? "es" : ""}` + (dups ? `; ${dups} ya existía${dups > 1 ? "n" : ""} y se guardará${dups > 1 ? "n" : ""} como copia` : "") + ". ¿Continuar?")) return false;
+  items.forEach(it => { if (taken.has(it.id)) { it.name = it.name.slice(0, 50) + " (copia)"; it.id = rid("e"); } taken.add(it.id); it.updated = Date.now(); });
+  exams = [...items, ...exams]; flush(); renderLib(); say(`${items.length} examen${items.length > 1 ? "es importados" : " importado"}.`);
+  return true;
+}
+function importFile(f) {
+  if (f.size > 5e6) { say("El archivo es demasiado grande (máximo 5 MB)."); return Promise.resolve(); }
+  return new Promise(done => { const r = new FileReader(); r.onerror = () => { say("No se pudo leer el archivo."); done(); }; r.onload = async () => { await importText(r.result); done(); }; r.readAsText(f); });
+}
+$("impBtn").onclick = () => $("impFile").click();
+$("impFile").onchange = e => { const f = e.target.files[0]; e.target.value = ""; if (f) importFile(f); };
+$("pasteBtn").onclick = () => { $("pasteBox").hidden = !$("pasteBox").hidden; if (!$("pasteBox").hidden) $("pasteText").focus(); };
+$("pasteCancel").onclick = () => { $("pasteText").value = ""; $("pasteBox").hidden = true; };
+$("pasteLoad").onclick = async () => { const t = $("pasteText").value.trim(); if (!t) { say("Pega primero el contenido del JSON."); return; } if (await importText(t)) { $("pasteText").value = ""; $("pasteBox").hidden = true; } };
+const hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files");
+window.addEventListener("dragover", e => { if (hasFiles(e)) { e.preventDefault(); $("drop").classList.add("over"); } });
+window.addEventListener("dragleave", e => { if (!e.relatedTarget) $("drop").classList.remove("over"); });
+window.addEventListener("drop", async e => {
+  if (!hasFiles(e)) return; e.preventDefault(); $("drop").classList.remove("over");
+  const fs = [...e.dataTransfer.files].filter(f => /\.json$/i.test(f.name) || f.type === "application/json").slice(0, 5);
+  if (!fs.length) { say("Solo se pueden cargar archivos .json."); return; }
+  openPanel("library"); for (const f of fs) await importFile(f);
+});
+
+/* ---------- preguntas: examen y categorías ---------- */
+function renderQ() {
+  const e = cur(); $("qEmpty").hidden = !!e; $("qMain").hidden = !e; if (!e) return;
+  $("eName").value = e.name; $("eDesc").value = e.desc; $("eMin").value = e.minutes; $("ePer").value = e.perExam;
+  renderMeta(); renderCats(); renderList(); syncOpts();
+}
+function renderMeta() {
+  const e = cur(), n = e.questions.length, h = $("eHint");
+  h.hidden = n >= e.perExam;
+  h.textContent = n ? `Tienes ${n} pregunta${n > 1 ? "s" : ""} y cada examen usa ${e.perExam}: se usarán todas.` : "Aún no hay preguntas. Agrégalas en el banco de abajo.";
+}
+$("eName").oninput = ev => { cur().name = ev.target.value; touch(); status(); };
+$("eDesc").oninput = ev => { cur().desc = ev.target.value; touch(); };
+$("eMin").onchange = ev => { const e = cur(); e.minutes = clamp(Math.round(+ev.target.value) || 60, 1, 600); ev.target.value = e.minutes; touch(); };
+const OPT_SW = { swBack: "back", swShuf: "shuffle", swFb: "feedback" };
+function syncOpts() { const e = cur(); for (const [id, k] of Object.entries(OPT_SW)) { $(id).classList.toggle("active", e.opts[k]); $(id).setAttribute("aria-checked", e.opts[k]); } }
+for (const [id, k] of Object.entries(OPT_SW)) $(id).onclick = () => { const e = cur(); e.opts[k] = !e.opts[k]; syncOpts(); touch(); };
+$("ePer").onchange = ev => { const e = cur(); e.perExam = clamp(Math.round(+ev.target.value) || 20, 1, 500); ev.target.value = e.perExam; renderMeta(); touch(); };
+
+function renderCats() {
+  const e = cur(), box = $("catChips"); box.innerHTML = "";
+  e.categories.forEach(c => {
+    const n = e.questions.filter(q => q.cat === c).length, s = document.createElement("span"); s.className = "chip";
+    s.innerHTML = `<input type="color" class="cc" value="${colorOf(e, c)}" aria-label="Color de ${esc(c)}"><span style="margin:0 4px 0 6px">${esc(c)} (${n})</span><button title="Renombrar" aria-label="Renombrar">✎</button><button title="Quitar" aria-label="Quitar">×</button>`;
+    const [r, x] = s.querySelectorAll("button"); const cp = s.firstChild; cp.onchange = () => { e.colors[c] = cp.value; touch(); renderList(); }; r.onclick = () => renameCat(c); x.onclick = () => delCat(c); box.appendChild(s);
+  });
+  const f = $("qFilter"), v = f.value;
+  f.innerHTML = '<option value="*">Todas las categorías</option><option value="">Sin categoría</option>' + e.categories.map(c => `<option>${esc(c)}</option>`).join("");
+  f.value = [...f.options].some(o => o.value === v) ? v : "*";
+}
+async function renameCat(c) {
+  const e = cur(), n = ((await ask("Nuevo nombre de la categoría:", c)) || "").trim().slice(0, 30);
+  if (!n || n === c) return;
+  if (e.categories.includes(n)) { say("Ya existe una categoría con ese nombre."); return; }
+  e.colors[n] = colorOf(e, c); delete e.colors[c]; e.categories = e.categories.map(x => x === c ? n : x); e.questions.forEach(q => { if (q.cat === c) q.cat = n; });
+  touch(); renderCats(); renderList();
+}
+async function delCat(c) {
+  const e = cur(), n = e.questions.filter(q => q.cat === c).length;
+  if (!await ask(`¿Quitar la categoría «${c}»?` + (n ? ` Sus ${n} pregunta${n > 1 ? "s" : ""} quedarán sin categoría.` : ""))) return;
+  delete e.colors[c]; e.categories = e.categories.filter(x => x !== c); e.questions.forEach(q => { if (q.cat === c) q.cat = ""; });
+  touch(); renderCats(); renderList();
+}
+$("catAdd").onclick = () => {
+  const e = cur(), n = $("catNew").value.trim().slice(0, 30);
+  if (!n) return;
+  if (e.categories.includes(n)) { say("Esa categoría ya existe."); return; }
+  if (e.categories.length >= 40) { say("Máximo 40 categorías."); return; }
+  e.colors[n] = PALETTE[e.categories.length % PALETTE.length]; e.categories.push(n); $("catNew").value = ""; touch(); renderCats(); renderList();
+};
+$("catNew").onkeydown = ev => { if (ev.key === "Enter") $("catAdd").click(); };
+
+/* ---------- preguntas: banco ---------- */
+const sumHtml = q => `<span class="qt">${esc(q.text || "(sin enunciado)")}</span><span class="badges">${incomplete(q) ? '<span class="badge w">Incompleta</span>' : ""}${q.multiple ? '<span class="badge">Múltiple</span>' : ""}${q.cat ? `<span class="badge"><i class="dot2" style="background:${colorOf(cur(), q.cat)}"></i>${esc(q.cat)}</span>` : ""}<span class="badge">${DIFF[q.diff]} · peso ${q.weight}</span></span>`;
+function renderList() {
+  const e = cur(), f = $("qFilter").value, s = $("qSearch").value.trim().toLowerCase(), box = $("qList"); box.innerHTML = "";
+  let n = 0;
+  e.questions.forEach(q => {
+    if ((f !== "*" && q.cat !== f) || (s && !q.text.toLowerCase().includes(s))) return; n++;
+    const d = document.createElement("details"); d.className = "q"; d.dataset.id = q.id; d.style.borderLeft = `4px solid ${qColor(e, q)}`; d.innerHTML = `<summary>${sumHtml(q)}</summary>`;
+    d.addEventListener("toggle", () => { if (d.open && !d.dataset.built) { d.dataset.built = 1; buildForm(d, q); } });
+    box.appendChild(d);
+  });
+  if (!n) box.innerHTML = '<p class="muted">No hay preguntas en esta vista.</p>';
+}
+$("qFilter").onchange = renderList; $("qSearch").oninput = renderList;
+$("addQ").onclick = () => {
+  const e = cur(), f = $("qFilter").value;
+  if (e.questions.length >= 1000) { say("Máximo 1000 preguntas por examen."); return; }
+  const q = newQ(); if (f !== "*") q.cat = f; $("qSearch").value = "";
+  e.questions.unshift(q); touch(); renderCats(); renderMeta(); renderList();
+  const d = document.querySelector(`[data-id="${q.id}"]`); if (d) { d.open = true; d.scrollIntoView({ block: "nearest" }); }
+};
+function buildForm(d, q) {
+  const e = cur(), b = document.createElement("div"); b.className = "qbody";
+  b.innerHTML = `<div class="fg" style="margin-top:12px"><label>Enunciado</label><textarea rows="3" maxlength="1000" data-k="text">${esc(q.text)}</textarea></div>
+<label>Opciones <small>marca las correctas; el texto de abajo de cada una explica por qué</small></label><div class="opts"></div><button class="add" data-a="opt">+ Agregar opción</button>
+<div class="grid3"><div class="fg"><label>Categoría</label><select data-k="cat"><option value="">Sin categoría</option>${e.categories.map(c => `<option>${esc(c)}</option>`).join("")}</select></div>
+<div class="fg"><label>Dificultad</label><select data-k="diff"><option value="1">Fácil</option><option value="2">Media</option><option value="3">Difícil</option></select></div>
+<div class="fg"><label>Peso (importancia)</label><select data-k="weight">${[1, 2, 3, 4, 5].map(n => `<option>${n}</option>`).join("")}</select></div></div>
+<div class="option"><span>Selección múltiple (todo o nada)</span><button class="switch" data-a="multi" role="switch"><span class="dot"></span></button></div>
+<div class="fg"><label>Explicación de la respuesta correcta</label><textarea rows="3" maxlength="1500" data-k="expl">${esc(q.expl)}</textarea></div>
+<div class="row"><button class="btn sm" data-a="up">▲ Subir</button><button class="btn sm" data-a="down">▼ Bajar</button><button class="btn sm" data-a="dup">Duplicar</button><button class="btn sm danger" data-a="del">Borrar</button></div>`;
+  for (const k of ["cat", "diff", "weight"]) b.querySelector(`[data-k=${k}]`).value = q[k];
+  const sw = b.querySelector("[data-a=multi]"), ob = b.querySelector(".opts");
+  const sum = () => { d.querySelector("summary").innerHTML = sumHtml(q); touch(); };
+  const drawO = () => {
+    sw.classList.toggle("active", q.multiple); sw.setAttribute("aria-checked", q.multiple); ob.innerHTML = "";
+    q.options.forEach((o, i) => {
+      const r = document.createElement("div"); r.className = "orow";
+      r.innerHTML = `<input type="${q.multiple ? "checkbox" : "radio"}" name="r${q.id}" ${o.ok ? "checked" : ""} aria-label="Correcta" title="Correcta"><input type="text" maxlength="300" value="${esc(o.t)}" placeholder="Opción ${i + 1}"><button class="icon" title="Quitar" aria-label="Quitar" ${q.options.length <= 2 ? "disabled" : ""}>×</button><input type="text" class="why" maxlength="500" value="${esc(o.why)}" placeholder="Por qué es correcta o incorrecta (opcional)">`;
+      const [ok, t, x, w] = r.children;
+      ok.onchange = () => { if (q.multiple) o.ok = ok.checked; else q.options.forEach(p => { p.ok = p === o; }); sum(); };
+      t.oninput = () => { o.t = t.value; sum(); };
+      w.oninput = () => { o.why = w.value; touch(); };
+      x.onclick = () => { q.options.splice(i, 1); drawO(); sum(); };
+      ob.appendChild(r);
+    });
+  };
+  b.addEventListener("input", ev => {
+    const k = ev.target.dataset.k; if (!k) return;
+    q[k] = k === "diff" || k === "weight" ? +ev.target.value : ev.target.value;
+    if (k === "cat") { renderCats(); d.style.borderLeftColor = qColor(e, q); }
+    sum();
+  });
+  b.addEventListener("click", async ev => {
+    const el = ev.target.closest("[data-a]"), a = el && el.dataset.a;
+    if (a === "opt") { if (q.options.length < 8) { q.options.push(newOpt()); drawO(); sum(); } }
+    else if (a === "multi") { q.multiple = !q.multiple; if (!q.multiple) oneOk(q.options); drawO(); sum(); }
+    else if (a === "up" || a === "down") { const i = e.questions.indexOf(q), j = i + (a === "up" ? -1 : 1); if (j < 0 || j >= e.questions.length) return; [e.questions[i], e.questions[j]] = [e.questions[j], e.questions[i]]; touch(); renderList(); const d2 = document.querySelector(`[data-id="${q.id}"]`); if (d2) { d2.open = true; d2.scrollIntoView({ block: "nearest" }); } }
+    else if (a === "dup") { const c = cleanQ(clone(q)); c.id = rid("q"); e.questions.splice(e.questions.indexOf(q) + 1, 0, c); touch(); renderCats(); renderMeta(); renderList(); say("Pregunta duplicada."); }
+    else if (a === "del") { if (!await ask("¿Borrar esta pregunta?")) return; e.questions.splice(e.questions.indexOf(q), 1); touch(); renderCats(); renderMeta(); renderList(); }
+  });
+  drawO(); d.appendChild(b);
+}
+
+/* ---------- examen completo ---------- */
+const sum = a => a.reduce((x, y) => x + y, 0), fmtT = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+const hist = () => { const h = LS.read("exam-history"); return Array.isArray(h) ? h : []; };
+function loadRun() {
+  const r = LS.read("exam-run");
+  if (!r || !Array.isArray(r.qs) || !r.qs.length || !Array.isArray(r.ans)) return null;
+  r.qs = r.qs.map(cleanQ);
+  r.ans = r.qs.map((q, i) => (Array.isArray(r.ans[i]) ? r.ans[i] : []).filter(n => Number.isInteger(n) && n >= 0 && n < q.options.length));
+  r.fl = r.qs.map((_, i) => !!(Array.isArray(r.fl) && r.fl[i])); r.chk = r.qs.map((_, i) => !!(Array.isArray(r.chk) && r.chk[i])); r.t = r.qs.map((_, i) => Math.max(0, +(Array.isArray(r.t) && r.t[i]) || 0)); r.back = r.back !== false; r.fb = !!r.fb; r.lap = Date.now(); r.mode = r.mode === "review" ? "review" : "full"; r.i = clamp(Math.round(+r.i) || 0, 0, r.qs.length - 1); r.start = Number(r.start) || Date.now(); r.secs = clamp(Math.round(+r.secs) || 60, 60, 36000);
+  r.examName = String(r.examName || "Examen").slice(0, 60); return r;
+}
+let run = loadRun(), results = null;
+const left = () => Math.max(0, Math.ceil(run.secs - (Date.now() - run.start) / 1000)), saveRun = () => LS.write("exam-run", run);
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// Muestreo ponderado sin reemplazo: las preguntas de más peso salen con más frecuencia.
+function sample(e, pool) {
+  const ok = pool || e.questions.filter(q => !incomplete(q)), n = Math.min(e.perExam, ok.length);
+  const pick = ok.map((q, i) => ({ q, i, k: Math.pow(Math.random(), 1 / q.weight) })).sort((a, b) => b.k - a.k).slice(0, n);
+  return (e.opts.shuffle ? shuffle(pick) : pick.sort((a, b) => a.i - b.i)).map(x => clone(x.q));
+}
+function begin(e, qs, name, mode) {
+  const now = Date.now();
+  run = { examId: e.id, examName: name, mode, start: now, lap: now, secs: secsFor(e, qs.length), i: 0, qs, ans: qs.map(() => []), fl: qs.map(() => false), chk: qs.map(() => false), t: qs.map(() => 0), back: e.opts.back, fb: e.opts.feedback };
+  saveRun(); renderExam();
+}
+const lap = r => { const n = Date.now(); r.t[r.i] = (r.t[r.i] || 0) + (n - r.lap) / 1000; r.lap = n; };
+const secsFor = (e, n) => Math.max(60, Math.round(e.minutes * 60 * n / e.perExam));
+const wide = on => document.querySelector(".content").classList.toggle("wide", on);
+function toggleFlag() { run.fl[run.i] = !run.fl[run.i]; saveRun(); drawQ(); }
+document.addEventListener("keydown", ev => {
+  if (!run || ev.ctrlKey || ev.metaKey || ev.altKey || !$("qCard") || !$("dlg").hidden || !document.querySelector("[data-panel=exam].active")) return;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) && ev.target.type !== "radio" && ev.target.type !== "checkbox") return;
+  const k = ev.key;
+  if (k === "ArrowRight") go(run.i + 1); else if (k === "ArrowLeft") go(run.i - 1);
+  else if (k === "f" || k === "F") toggleFlag();
+  else if (/^[1-8]$/.test(k)) { const o = document.querySelectorAll("#qCard .opt input")[+k - 1]; if (o) o.click(); }
+  else return;
+  ev.preventDefault();
+});
+setInterval(() => { if (!run) return; const c = $("clock"), l = left(); if (c) { c.textContent = fmtT(l); c.classList.toggle("low", l < 60); } if (l === 0) finish(true); }, 1000);
+
+function renderExam() {
+  const box = $("exBox");
+  wide(!!(results || run));
+  if (results) return renderResults(box);
+  if (run) { if (left() === 0) return finish(true); return renderRun(box); }
+  const e = cur();
+  if (!e) { box.innerHTML = '<div class="card"><p style="margin:0 0 12px">No hay un examen abierto. Ábrelo desde la Biblioteca.</p><button class="btn primary">Ir a la Biblioteca</button></div>'; box.querySelector("button").onclick = () => openPanel("library"); return; }
+  const ok = e.questions.filter(q => !incomplete(q)).length, bad = e.questions.length - ok, n = Math.min(e.perExam, ok), last = hist().find(h => h.exam === e.id);
+  box.innerHTML = `<div class="card"><h3>${esc(e.name)}</h3><p style="margin:0">Examen completo: ${n} pregunta${n === 1 ? "" : "s"} · ${Math.round(secsFor(e, n) / 60)} min</p>`
+    + (ok > n ? `<p class="muted">Hay ${ok} preguntas y el examen usa ${n}: se eligen al azar y las de más peso salen con más frecuencia.</p>` : "")
+    + (n && n < e.perExam ? '<p class="muted">Hay menos preguntas que las configuradas, así que el tiempo se reduce en proporción.</p>' : "")
+    + (bad ? `<p class="muted">Tienes ${bad} pregunta(s) incompleta(s); no entrarán en el examen.</p>` : "")
+    + (last ? `<p class="muted">Último intento: ${String(last.score).replace(".", ",")} % · ${fmt(last.date)}</p>` : "")
+    + `<button class="btn primary full" id="go" style="margin-top:14px" ${n ? "" : "disabled"}>Iniciar examen completo</button></div>`;
+  $("go").onclick = () => { const qs = sample(e); if (qs.length) begin(e, qs, e.name, "full"); };
+}
+function renderRun(box) {
+  box.innerHTML = '<div class="exgrid"><div class="exmain"><div class="card" id="qCard"></div></div><div class="exside"><div class="card rh"><strong id="prog"></strong><span class="clock" id="clock"></span></div><div class="card"><div class="qnav" id="qnav"></div><p class="muted">⚑ = marcada para volver. Atajos: 1–8 elegir · ← → mover · F marcar.</p></div><div class="card"><div class="row"><button class="btn" id="prev">← Anterior</button><button class="btn" id="next">Siguiente →</button></div><button class="btn flag" id="flag" style="width:100%;margin-top:8px"></button><div class="row" style="margin-top:16px"><button class="btn primary" id="fin">Finalizar examen</button><button class="btn danger" id="quit">Abandonar</button></div></div></div></div>';
+  $("clock").textContent = fmtT(left());
+  $("prev").onclick = () => go(run.i - 1); $("next").onclick = () => go(run.i + 1);
+  $("flag").onclick = toggleFlag;
+  $("fin").onclick = async () => { const n = run.ans.filter(a => !a.length).length, f = run.fl.filter(Boolean).length, t = [n && `${n} sin responder`, f && `${f} marcada${f > 1 ? "s" : ""}`].filter(Boolean).join(" y "); if (await ask(t ? `Tienes ${t}. ¿Finalizar el examen?` : "¿Finalizar el examen?")) finish(false); };
+  $("quit").onclick = async () => { if (await ask("¿Abandonar el examen? No se guardará ningún resultado.")) { run = null; LS.write("exam-run", null); renderExam(); } };
+  drawQ();
+}
+function go(i) { if (i < 0 || i >= run.qs.length || (!run.back && i < run.i)) return; lap(run); run.i = i; saveRun(); drawQ(); }
+function drawQ() {
+  const q = run.qs[run.i], a = run.ans[run.i], n = run.qs.length;
+  $("prog").textContent = `Pregunta ${run.i + 1} de ${n}`; $("prev").disabled = run.i === 0 || !run.back; $("next").disabled = run.i === n - 1; $("flag").classList.toggle("on", run.fl[run.i]); $("flag").textContent = run.fl[run.i] ? "⚑ Marcada (quitar marca)" : "⚑ Marcar para volver";
+  $("qCard").innerHTML = `<p class="qtext">${esc(q.text)}</p>` + (q.multiple ? '<p class="muted" style="margin:-6px 0 12px">Selección múltiple: marca todas las correctas.</p>' : "");
+  if (run.chk[run.i]) revRows(q, a, $("qCard")); else q.options.forEach((o, k) => {
+    if (!o.t.trim()) return;
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="${q.multiple ? "checkbox" : "radio"}" name="o" ${a.includes(k) ? "checked" : ""}><span><b>${$("qCard").querySelectorAll(".opt").length + 1}.</b> ${esc(o.t)}</span>`;
+    l.firstChild.onclick = ev => { const c = run.ans[run.i], has = c.includes(k); run.ans[run.i] = q.multiple ? (has ? c.filter(j => j !== k) : [...c, k].sort((x, y) => x - y)) : has ? [] : [k]; ev.target.checked = run.ans[run.i].includes(k); saveRun(); drawNav(); };
+    $("qCard").appendChild(l);
+  });
+  if (run.fb && !run.chk[run.i]) { const b = document.createElement("button"); b.className = "btn"; b.style.marginTop = "6px"; b.textContent = "Comprobar respuesta"; b.onclick = () => { if (!run.ans[run.i].length) { say("Elige una respuesta primero."); return; } run.chk[run.i] = true; saveRun(); drawQ(); }; $("qCard").appendChild(b); }
+  drawNav();
+}
+function revRows(q, p, box) {
+  const right = q.options.map((o, k) => o.ok && o.t.trim() ? k : -1).filter(k => k >= 0);
+  box.insertAdjacentHTML("beforeend", q.options.map((o, k) => !o.t.trim() ? "" : `<div class="ro ${right.includes(k) ? "good" : p.includes(k) ? "bad" : ""}"><b>${right.includes(k) ? "✓" : p.includes(k) ? "✗" : "·"}</b><div>${esc(o.t)}${p.includes(k) ? " <small>(tu respuesta)</small>" : ""}${o.why ? `<small>${esc(o.why)}</small>` : ""}</div></div>`).join("") + (q.expl ? `<p class="muted"><b>Explicación:</b> ${esc(q.expl)}</p>` : ""));
+}
+function drawNav() {
+  const b = $("qnav"); b.innerHTML = "";
+  run.qs.forEach((_, i) => { const x = document.createElement("button"); x.className = "nb" + (run.ans[i].length ? " on" : "") + (i === run.i ? " cur" : "") + (run.fl[i] ? " fl" : ""); x.textContent = i + 1; x.disabled = !run.back; x.setAttribute("aria-label", "Ir a la pregunta " + (i + 1)); x.onclick = () => go(i); b.appendChild(x); });
+}
+// Todo o nada: la pregunta cuenta solo si el conjunto marcado coincide exactamente con las correctas.
+function finish(timeout) {
+  const r = run; lap(r); run = null; LS.write("exam-run", null);
+  const used = Math.min(r.secs, Math.max(0, Math.round((Date.now() - r.start) / 1000)));
+  const items = r.qs.map((q, i) => { const p = r.ans[i], right = q.options.map((o, k) => o.ok && o.t.trim() ? k : -1).filter(k => k >= 0); return { q, p, right, ok: p.length === right.length && right.every(k => p.includes(k)), t: Math.round(r.t[i] || 0) }; });
+  const correct = items.filter(x => x.ok).length, score = Math.round(sum(items.filter(x => x.ok).map(x => x.q.weight)) / sum(items.map(x => x.q.weight)) * 1000) / 10;
+  results = { r, items, used, score, correct, timeout };
+  LS.write("exam-history", [{ id: rid("a"), exam: r.examId, name: r.examName, mode: r.mode || "full", date: Date.now(), used, score, correct, total: items.length, items: items.map(x => ({ q: x.q.id, c: x.q.cat, w: x.q.weight, ok: x.ok, t: x.t })) }, ...hist()].slice(0, 300));
+  openPanel("exam"); if (timeout) say("Se acabó el tiempo.");
+}
+const csvCell = v => { let s = String(v); if (/^[=@\t\r]/.test(s) || (/^[+-]/.test(s) && !/^[+-]?\d+(\.\d+)?$/.test(s))) s = "'" + s; return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function toCsv(R) {
+  const txt = (q, idx) => idx.map(k => q.options[k].t).join(" | ");
+  const rows = [["N", "Pregunta", "Categoría", "Peso", "Resultado", "Tiempo (s)", "Tu respuesta", "Respuesta correcta"], ...R.items.map((x, i) => [i + 1, x.q.text, x.q.cat, x.q.weight, x.ok ? "Correcta" : "Fallada", x.t, txt(x.q, x.p), txt(x.q, x.right)])];
+  return "\ufeff" + rows.map(r => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
+}
+function renderResults(box) {
+  const R = results, g = {};
+  R.items.forEach(x => { const c = x.q.cat || "Sin categoría"; (g[c] = g[c] || [0, 0])[1]++; if (x.ok) g[c][0]++; });
+  box.innerHTML = `<div class="exgrid"><div class="exside"><div class="card"><h3>${esc(R.r.examName)}</h3><p class="big">${String(R.score).replace(".", ",")} %</p><p style="margin:4px 0 0">${R.correct} de ${R.items.length} correctas · ${fmtT(R.used)} de ${fmtT(R.r.secs)}</p><p class="muted" style="margin:4px 0 0">Media por pregunta: ${Math.round(R.used / R.items.length)} s</p>${R.timeout ? '<p class="muted">Se acabó el tiempo: las preguntas sin responder cuentan como falladas.</p>' : ""}<p class="muted">La puntuación pondera cada pregunta por su peso.</p></div>`
+    + `<div class="card"><h3>Por categoría</h3>${Object.entries(g).map(([c, [a, t]]) => { const p = Math.round(a / t * 100); return `<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(c)}</span><small>${a}/${t} · ${p} %</small></div><div class="bar"><i style="width:${p}%"></i></div></div>`; }).join("")}</div>`
+    + '<button class="btn primary full" id="rvDone">Terminar revisión</button><button class="btn full" id="rvFail">Repasar fallos</button><button class="btn full" id="rvCsv">Exportar resultados (CSV)</button></div><div class="exmain"><div class="card"><h3>Revisión</h3><select id="rvF"><option value="*">Todas las preguntas</option><option value="x">Solo falladas</option></select><div id="rvList"></div></div></div></div>';
+  const draw = () => {
+    const f = $("rvF").value, l = $("rvList"); l.innerHTML = "";
+    R.items.forEach((x, n) => {
+      if (f === "x" && x.ok) return;
+      const d = document.createElement("details"); d.className = "q " + (x.ok ? "good" : "bad");
+      d.innerHTML = `<summary><span class="qt"><span class="mk">${x.ok ? "✓" : "✗"}</span> ${n + 1}. ${esc(x.q.text)}</span><span class="badge">${x.t} s</span></summary><div class="qbody">` + (x.p.length ? "" : '<p class="muted">Sin responder.</p>')
+        + x.q.options.map((o, k) => !o.t.trim() ? "" : `<div class="ro ${x.right.includes(k) ? "good" : x.p.includes(k) ? "bad" : ""}"><b>${x.right.includes(k) ? "✓" : x.p.includes(k) ? "✗" : "·"}</b><div>${esc(o.t)}${x.p.includes(k) ? " <small>(tu respuesta)</small>" : ""}${o.why ? `<small>${esc(o.why)}</small>` : ""}</div></div>`).join("")
+        + (x.q.expl ? `<p class="muted"><b>Explicación:</b> ${esc(x.q.expl)}</p>` : "") + "</div>";
+      l.appendChild(d);
+    });
+    if (!l.children.length) l.innerHTML = '<p class="muted">No hay preguntas en esta vista.</p>';
+  };
+  $("rvF").onchange = draw; draw();
+  $("rvDone").onclick = () => { results = null; renderExam(); };
+  $("rvFail").hidden = !R.items.some(x => !x.ok);
+  $("rvFail").onclick = () => { const e = exams.find(x => x.id === R.r.examId); if (!e) { say("El examen original ya no existe."); return; } const qs = R.items.filter(x => !x.ok).map(x => clone(x.q)); results = null; begin(e, qs, e.name + " (repaso)", "review"); };
+  $("rvCsv").onclick = () => { saveFile(slug(R.r.examName) + "-resultado.csv", new Blob([toCsv(R)], { type: "text/csv;charset=utf-8" })); say("CSV descargado."); };
+}
+
+/* ---------- estadísticas ---------- */
+let stSel = null;
+const pct = (a, b) => (b ? Math.round(a / b * 100) : 0), dshort = t => new Date(t).toLocaleDateString("es", { day: "numeric", month: "short" });
+function lineSvg(F) {
+  const W = 600, H = 190, L = 34, Rr = 12, T = 12, B = 26, x = i => (F.length < 2 ? (L + W - Rr) / 2 : L + i * (W - L - Rr) / (F.length - 1)), y = v => T + (100 - v) * (H - T - B) / 100;
+  let h = [0, 50, 100].map(v => `<line x1="${L}" y1="${y(v)}" x2="${W - Rr}" y2="${y(v)}" stroke="var(--border)"/><text x="${L - 6}" y="${y(v)}" text-anchor="end" dominant-baseline="central" font-size="11" fill="var(--muted)">${v}</text>`).join("");
+  h += `<polyline points="${F.map((f, i) => x(i).toFixed(1) + "," + y(f.score).toFixed(1)).join(" ")}" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  h += F.map((f, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(f.score).toFixed(1)}" r="4" fill="var(--primary)"><title>${dshort(f.date)}: ${f.score} %</title></circle>`).join("");
+  h += `<text x="${L}" y="${H - 6}" font-size="11" fill="var(--muted)">${dshort(F[0].date)}</text>` + (F.length > 1 ? `<text x="${W - Rr}" y="${H - 6}" text-anchor="end" font-size="11" fill="var(--muted)">${dshort(F[F.length - 1].date)}</text>` : "");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="Puntaje por intento">${h}</svg>`;
+}
+function radarSvg(c) {
+  const N = c.length, cx = 190, cy = 140, R = 88, a = i => -Math.PI / 2 + i * 2 * Math.PI / N, pt = (i, r) => [cx + Math.cos(a(i)) * r, cy + Math.sin(a(i)) * r], pts = f => c.map((_, i) => pt(i, R * f(i)).map(v => v.toFixed(1)).join(",")).join(" ");
+  let h = [.25, .5, .75, 1].map(k => `<polygon points="${pts(() => k)}" fill="none" stroke="var(--border)"/>`).join("");
+  c.forEach((_, i) => { const [x, y] = pt(i, R); h += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--border)"/>`; });
+  h += `<polygon points="${pts(i => c[i].p / 100)}" fill="var(--primary)" fill-opacity=".18" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  c.forEach((x, i) => { const [px, py] = pt(i, R + 14), co = Math.cos(a(i)); h += `<text x="${px.toFixed(1)}" y="${py.toFixed(1)}" text-anchor="${co > .3 ? "start" : co < -.3 ? "end" : "middle"}" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text)">${esc(x.name.slice(0, 12))} ${x.p}%</text>`; });
+  return `<svg viewBox="0 0 380 280" style="width:100%;height:auto" role="img" aria-label="Precisión por categoría">${h}</svg>`;
+}
+function renderStats() {
+  const box = $("stBox"), all = hist();
+  if (!all.length) { box.innerHTML = '<div class="card"><p style="margin:0">Aún no hay intentos. Termina un examen para ver aquí tu historial y tus estadísticas.</p></div>'; return; }
+  const names = new Map(); all.forEach(h => { if (!names.has(h.exam)) names.set(h.exam, String(h.name || "Examen").replace(/ \(repaso\)$/, "")); });
+  if (stSel !== "*" && !names.has(stSel)) stSel = cur() && names.has(cur().id) ? cur().id : "*";
+  const H = all.filter(h => stSel === "*" || h.exam === stSel), F = H.filter(h => h.mode !== "review").sort((a, b) => a.date - b.date);
+  const idx = new Map(); exams.forEach(e => e.questions.forEach(q => idx.set(e.id + "|" + q.id, q)));
+  const ex = exams.find(e => e.id === stSel), its = F.flatMap(h => h.items || []), n = F.length;
+  const g = {}; its.forEach(i => { const c = i.c || "Sin categoría", o = g[c] = g[c] || [0, 0, 0]; o[1]++; o[2] += i.t || 0; if (i.ok) o[0]++; });
+  const cats = Object.entries(g).map(([name, [ok, t, tt]]) => ({ name, ok, t, p: pct(ok, t), s: Math.round(tt / t) })).sort((a, b) => a.name.localeCompare(b.name));
+  const m = {};
+  F.forEach(h => (h.items || []).forEach(i => { const key = h.exam + "|" + i.q, o = m[key] = m[key] || { key, n: 0, f: 0, t: 0, c: i.c }; o.n++; o.t += i.t || 0; if (!i.ok) o.f++; }));
+  const top = Object.values(m).filter(o => o.f).sort((a, b) => b.f / b.n - a.f / a.n || b.f - a.f).slice(0, 10);
+  const avg = n ? Math.round(sum(F.map(h => +h.score || 0)) / n * 10) / 10 : 0, mv = (l, v) => `<div><small>${l}</small><div class="mv">${v}</div></div>`, f1 = v => String(v).replace(".", ",");
+  const side = `<div class="exside ns"><div class="card"><h3>Resumen</h3><select id="stSel" aria-label="Examen"><option value="*">Todos los exámenes</option>${[...names].map(([id, nm]) => `<option value="${esc(id)}">${esc(nm)}</option>`).join("")}</select>`
+    + `<div class="mgrid">${mv("Intentos", n)}${mv("Promedio", n ? f1(avg) + " %" : "—")}${mv("Mejor", n ? f1(Math.max(...F.map(h => +h.score || 0))) + " %" : "—")}${mv("Último", n ? f1(F[n - 1].score) + " %" : "—")}${mv("Preguntas", its.length)}${mv("Seg. por pregunta", its.length ? Math.round(sum(its.map(i => i.t || 0)) / its.length) : "—")}</div>`
+    + '<p class="muted">Los repasos de fallos aparecen en la lista pero no cuentan en las métricas.</p></div>'
+    + `<div class="card"><h3>Por categoría</h3>${cats.length >= 3 ? radarSvg(cats) : ""}${cats.map(c => { const col = ex && ex.categories.includes(c.name) ? colorOf(ex, c.name) : "var(--primary)"; return `<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(c.name)}</span><small>${c.ok}/${c.t} · ${c.p} % · ${c.s} s</small></div><div class="bar"><i style="width:${c.p}%;background:${col}"></i></div></div>`; }).join("") || '<p class="muted" style="margin:0">Sin datos todavía.</p>'}</div></div>`;
+  const attempts = H.slice().sort((a, b) => b.date - a.date).slice(0, 100).map(h => {
+    const gg = {}; (h.items || []).forEach(i => { const c = i.c || "Sin categoría", o = gg[c] = gg[c] || [0, 0]; o[1]++; if (i.ok) o[0]++; });
+    const bad = (h.items || []).filter(i => !i.ok).map(i => idx.get(h.exam + "|" + i.q)), nm = String(h.name || "Examen");
+    return `<details class="q"><summary><span class="qt">${dshort(h.date)} · ${esc(nm)} · <b>${f1(h.score)} %</b> (${h.correct}/${h.total}) · ${fmtT(h.used || 0)}</span>${h.mode === "review" ? '<span class="badge">Repaso</span>' : ""}</summary><div class="qbody"><p class="muted">${Object.entries(gg).map(([c, [a, t]]) => `${esc(c)}: ${a}/${t}`).join(" · ")}</p>${bad.length ? bad.map(q => `<div class="ro bad"><b>✗</b><div>${q ? esc(q.text) : "(pregunta eliminada)"}</div></div>`).join("") : '<p class="muted">Sin fallos.</p>'}<button class="btn sm danger" style="margin-top:10px" data-del="${esc(h.id)}">Borrar intento</button></div></details>`;
+  }).join("");
+  const main = `<div class="exmain st"><div class="card"><h3>Histórico</h3>${n ? lineSvg(F) : '<p class="muted" style="margin:0">Aún no hay intentos de examen completo.</p>'}</div>`
+    + `<div class="card"><h3>Preguntas más falladas</h3>${top.map(o => { const q = idx.get(o.key); return `<div class="ro bad"><b>${o.f}/${o.n}</b><div>${q ? esc(q.text) : "(pregunta eliminada)"}<small>${o.c ? esc(o.c) + " · " : ""}${Math.round(o.t / o.n)} s de media</small></div></div>`; }).join("") || '<p class="muted" style="margin:0">No hay fallos registrados.</p>'}</div>`
+    + `<div class="card"><h3>Intentos</h3>${attempts}<button class="btn sm danger" id="stClear" style="margin-top:12px">Borrar historial${stSel === "*" ? "" : " de este examen"}</button></div></div>`;
+  box.innerHTML = `<div class="exgrid">${side}${main}</div>`;
+  $("stSel").value = stSel;
+  $("stSel").onchange = ev => { stSel = ev.target.value; renderStats(); };
+  box.querySelectorAll("[data-del]").forEach(b => { b.onclick = async () => { if (!await ask("¿Borrar este intento?")) return; LS.write("exam-history", hist().filter(h => h.id !== b.dataset.del)); renderStats(); }; });
+  $("stClear").onclick = async () => { if (!await ask(stSel === "*" ? "¿Borrar todo el historial?" : "¿Borrar el historial de este examen?")) return; LS.write("exam-history", hist().filter(h => stSel !== "*" && h.exam !== stSel)); renderStats(); say("Historial borrado."); };
+}
+
+/* ---------- inicio ---------- */
+renderLib(); status();
+</script>
+</body>
+</html>
